@@ -1,0 +1,46 @@
+#!/usr/bin/env seed-node
+
+var s = require("spawn");
+var fs = require("core_support:fs"), 
+    smartdown = require("smartdown"), Path = require("core_support:path"),
+    haml = require("haml-js");
+
+var templateName = process.ARGV[3];
+var template = haml.optimize(haml.compile(fs.readFile(templateName)));
+
+s.receive(function(message, done){
+  var source = message.input, out = message.output, relative = message.cwd;
+
+  // adjust relative path as needed
+  if (relative[0] === ".") relative = relative.substr(2);
+  relative = relative.replace(/[^\/]+/g, "..");
+
+  // make output directory
+  fs.mkdir_p(Path.dirname(out), 0777);
+
+  // read content (and replace emdash because I like them :)
+  var content = fs.readFile(source);
+  content.replace("–", "&emdash");
+
+  // generate w/template
+  var result = smartdown.render(content);
+  fs.writeFile(out, haml.execute(template, 
+    {
+      "title": source,
+      "contents": result
+    },
+    {
+      static_url: function(url) 
+      {
+        return relative + url;
+      }
+    }
+  ));
+    
+  done({message: "YAY"});
+});
+
+/*
+
+
+*/

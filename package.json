@@ -1,0 +1,14 @@
+{
+    "name": "hoo",
+    "description": "The Doctor, a documentation generator that uses smartdown (Markdown + Syntax Highlighting).",
+    "version": "0.1.0",
+    "keywords": ["markdown", "documentation"],
+    "contributors": ["Alex Iskander"],
+    "dependencies": {
+      "spawn": "0.1.2",
+      "optparse": "0.1.2",
+      "smartdown": "0.1.4",
+      "core_support": "0.1.1",
+      "haml-js": "0.1.3"
+    }
+}
