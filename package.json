@@ -4,9 +4,9 @@
     "version": "0.1.1",
     "keywords": ["markdown", "documentation"],
     "contributors": ["Alex Iskander"],
-    "repositories": {
+    "repositories": [
       { "type": "git", "url": "git://github.com/ialexi/hoo.git" }
-    },
+    ],
     "dependencies": {
       "spawn": "0.1.2",
       "optparse": "0.1.2",
