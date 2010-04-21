@@ -1,7 +1,7 @@
 {
     "name": "hoo",
     "description": "The Doctor, a documentation generator that uses smartdown (Markdown + Syntax Highlighting).",
-    "version": "0.1.1",
+    "version": "0.1.3",
     "keywords": ["markdown", "documentation"],
     "contributors": ["Alex Iskander"],
     "repositories": [

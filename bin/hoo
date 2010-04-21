@@ -1,4 +1,5 @@
-#!/usr/bin/env seed-node
+#!/usr/bin/env seed
+
 /*
   Doctor Hoo?
   A documentation generator that recursively searches an input directory for files
@@ -8,8 +9,8 @@
   who.js input output
   who.js --resources resources input output
 */
-
-var optparse = require('optparse'), who = require("hoo"), sys = require("sys"), fs = require("core_support:fs");
+var optparse = require('optparse'), who = require("hoo"); 
+var sys = require("sys"), fs = require("core-support:fs");
 
 var switches = [
 	['-h', '--help', 'Shows help (this message).'],

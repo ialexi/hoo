@@ -1,15 +1,24 @@
-#!/usr/bin/env seed-node
+#!/usr/bin/env seed
 
 var s = require("spawn");
-var fs = require("core_support:fs"), 
-    smartdown = require("smartdown"), Path = require("core_support:path"),
-    haml = require("haml-js");
+var fs = require("core-support:fs"), 
+    Path = require("core-support:path"),
+    haml = require("haml-js"),
+    article = require("hoo:article"),
+    guide = require("hoo:guide");
 
 var templateName = process.ARGV[3];
 var template = haml.optimize(haml.compile(fs.readFile(templateName)));
 
 s.receive(function(message, done){
-  var source = message.input, out = message.output, relative = message.cwd;
+  var source = message.input,
+      type = message.type,
+      out = message.output,
+      cwd = message.cwd,
+      relative = cwd,
+      inputDirectory = message.inputDirectory,
+      outputDirectory = message.outputDirectory,
+      outputPath = message.outputPath;
 
   // adjust relative path as needed
   if (relative[0] === ".") relative = relative.substr(2);
@@ -17,26 +26,38 @@ s.receive(function(message, done){
 
   // make output directory
   fs.mkdir_p(Path.dirname(out), 0777);
-
-  // read content (and replace emdash because I like them :)
+  
+  // read content
   var content = fs.readFile(source);
-  content.replace("–", "&emdash");
+  
+  // PROCESS ARTICLES
+  var res;
+  if (type == "md") {
+    var outHTML = out + ".html",
+        outJSON = out + ".json";
+        
+    res = article.process(content, cwd, outputDirectory);
 
-  // generate w/template
-  var result = smartdown.render(content);
-  fs.writeFile(out, haml.execute(template, 
-    {
-      "title": source,
-      "contents": result
-    },
-    {
-      static_url: function(url) 
+    // write JSON
+    fs.writeFile(outJSON, JSON.stringify(res));
+
+    // write HTML
+    fs.writeFile(outHTML, haml.execute(template, 
+      res,
       {
-        return relative + url;
+        static_url: function(url) 
+        {
+          return relative + url;
+        }
       }
-    }
-  ));
-    
+    ));
+  } else if (type == "guide") {
+    res = guide.process(content, relative, inputDirectory, outputDirectory);
+    res.file = out;
+    fs.writeFile(out + ".json", JSON.stringify(res));
+  }
+  
+  
   done({message: "YAY"});
 });
 
