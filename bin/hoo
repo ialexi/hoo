@@ -14,8 +14,11 @@ var sys = require("sys"), fs = require("core-support:fs");
 
 var switches = [
 	['-h', '--help', 'Shows help (this message).'],
-	['-r', '--resources PATH', 'Sets the resource directory. Default: resources (will ignore if not found)'],
-	['-t PATH', '--template PATH', 'Sets the template. Defaults to template.haml']
+	['-r PATH', '--resources PATH', 'Sets the resource directory. Default: resources (will ignore if not found)'],
+	['-t PATH', '--template PATH', 'Sets the template. Defaults to docs/template.haml'],
+	['-i PATH', '--input PATH', 'Sets the input directory. Defaults to docs.'],
+	['-o PATH', '--output PATH', 'Sets the output directory. Defaults to docs-build. OUTPUT DIRECTORY WILL BE OVERWRITTEN!'],
+	['-p NAME', '--package-name NAME', 'Sets the package name. Defaults to anon or the current package.']
 ];
 
 // prepare parser
@@ -24,16 +27,24 @@ parser.banner = 'Usage: hoo [input-folder] [output-folder]'
 
 // prepare settings
 var settings = {
-  input: null,
-  output: null,
+  input: "docs",
+  output: "docs-build", // remember, we are destructive, so we want to ABSOLUTELY NOT OVERLAP
   resources: "resources",
-  template: 'template.haml',
+  template: 'docs/template.haml',
+  packageName: "anon",
   progress: function(stats) {
     if (stats.err) throw stats.err;
     var total = stats.total, processed = stats.processed;
     sys.print("Processed: " + processed + " of " + total + "; " + (Math.round((processed / total) * 10000) / 100) + "%     \r");
   }
 };
+
+// attempt to find package name
+try {
+  var cwd = process.cwd();
+  var pkg = require.loader.openNearestPackage(cwd);
+  if (pkg) settings.packageName = pkg.get("name");
+} catch (e) {}
 
 // parser
 parser.on('help', function() {
@@ -48,12 +59,16 @@ parser.on('template', function(o, v) {
   settings.template = v;
 });
 
-parser.on(3, function(v) {
+parser.on('input', function(o, v) {
   settings.input = v;
 });
 
-parser.on(4, function(v) {
+parser.on('output', function(o, v) {
   settings.output = v;
+});
+
+parser.on('package-name', function(o, v){
+  settings.packageName = v;
 });
 
 parser.parse(process.ARGV);

@@ -18,7 +18,8 @@ s.receive(function(message, done){
       relative = cwd,
       inputDirectory = message.inputDirectory,
       outputDirectory = message.outputDirectory,
-      outputPath = message.outputPath;
+      outputPath = message.outputPath,
+      packageName = message.packageName;
 
   // adjust relative path as needed
   if (relative[0] === ".") relative = relative.substr(2);
@@ -52,7 +53,16 @@ s.receive(function(message, done){
       }
     ));
   } else if (type == "guide") {
-    res = guide.process(content, relative, inputDirectory, outputDirectory);
+    res = guide.process(content, {
+      relativeDirectory: relative,
+      inputDirectory: inputDirectory,
+      outputDirectory: outputDirectory,
+      packageName: packageName,
+      resourcePath: function(p) {
+        if (p.indexOf(":") < 0) return packageName + ":" + p;
+        else return p;
+      }
+    });
     res.file = out;
     fs.writeFile(out + ".json", JSON.stringify(res));
   }
