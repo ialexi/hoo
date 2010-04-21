@@ -8,10 +8,10 @@
       { "type": "git", "url": "git://github.com/ialexi/hoo.git" }
     ],
     "dependencies": {
-      "spawn": "0.1.2",
-      "optparse": "0.1.2",
+      "spawn": "0.1.3",
+      "optparse": "0.1.3",
       "smartdown": "0.1.4",
-      "core_support": "0.1.1",
+      "core-support": "0.2.1",
       "haml-js": "0.1.3"
     }
 }
